@@ -15,8 +15,3 @@ To shutdown the Rpi type:
 ```
 > sudo shutdown -h now
 ```
-
-
-A copy of the initial sequence files and the Python script is available here:
-
-[https://github.com/lewiswalsh/creeksea-race-timer](https://github.com/lewiswalsh/creeksea-race-timer)

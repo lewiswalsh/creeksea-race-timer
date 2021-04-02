@@ -1,17 +1,17 @@
 import RPi.GPIO as GPIO
-import lib4relay
 import threading
 import time
 import csv
+import os
 
 # Pins
-BUTTON_ONE   = 23
-BUTTON_TWO   = 24
-BUTTON_RESET = 25
-LED_READY    = 27
-LED_RESET    = 17
-LED_ONE      = 9
-LED_TWO      = 10
+BUTTON_ONE      = 23
+BUTTON_TWO      = 24
+BUTTON_RESET    = 25
+LED_READY       = 27
+LED_RESET       = 17
+LED_ONE         = 9
+LED_TWO         = 10
 
 # GPIO setup LED pins as outputs
 GPIO.setmode(GPIO.BCM)
@@ -74,15 +74,19 @@ class Race(threading.Thread):
 
 	# Run through sequence
 	def countUp(self):
-		end = max(self._sequence.iterkeys())
+		end = (list(reversed(list(self._sequence)))[0]) + 1
 		for i in range(end):
 			if self._stop:
-				print("sequence stopped")
+				print("SEQUENCE STOPPED")
 				break
 			elif i in self._sequence:
-				lib4relay.set_all(0, int(self._sequence[i], 2))
-			time.sleep(1)
+				print(self._sequence[i])
+				os.system("4relay 0 write "+ str(int(self._sequence[i], 2)))
+			else:
+				print(i)
+			time.sleep(1 - time.monotonic() % 1)
 		self._stop = False
+		print("SEQUENCE END")
 		init()
 
 	# Load and run
@@ -105,12 +109,11 @@ def lightLED(led, t):
 def flashLights():
 	lightLED(LED_ONE, 0)
 	lightLED(LED_TWO, 0)
-	#lightLED(LED_READY, 0)
 	lightLED(LED_RESET, 0)
 	time.sleep(0.5)
 	lightLED(LED_ONE, -1)
-  lightLED(LED_TWO, -1)
-  lightLED(LED_RESET, -1)
+	lightLED(LED_TWO, -1)
+	lightLED(LED_RESET, -1)
 
 
 # Initialise program
@@ -147,5 +150,3 @@ while True: # Main program loop
 	except (KeyboardInterrupt, SystemExit): # Cleanup
 		GPIO.cleanup()
 		exit()
-
-
